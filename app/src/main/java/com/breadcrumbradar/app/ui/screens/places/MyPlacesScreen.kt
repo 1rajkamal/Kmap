@@ -30,14 +30,16 @@ import com.breadcrumbradar.app.ui.components.GlassCard
 import com.breadcrumbradar.app.ui.theme.CyberCyan
 import com.breadcrumbradar.app.ui.theme.ElectricEmerald
 import com.breadcrumbradar.app.ui.theme.WarningAmber
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyPlacesScreen(
     viewModel: PlacesViewModel,
     locationState: LocationState,
-    onNavigateToRadar: (SavedLocation) -> Unit,
-    onOpenMap: () -> Unit,
+    onLocateOnMap: (SavedLocation) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -93,23 +95,13 @@ fun MyPlacesScreen(
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     Text(
-                        text = "${uiState.filteredLocations.size} bookmarks stored locally",
+                        text = "${uiState.filteredLocations.size} locations stored locally on device",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
 
                 Row(horizontalArrangement = Arrangement.spacedBy(6.dp)) {
-                    // Open Map Button
-                    IconButton(
-                        onClick = onOpenMap,
-                        colors = IconButtonDefaults.iconButtonColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    ) {
-                        Icon(Icons.Default.Map, contentDescription = "Open Map", tint = CyberCyan)
-                    }
-
                     // Export Backup Button
                     IconButton(
                         onClick = {
@@ -237,7 +229,7 @@ fun MyPlacesScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = if (uiState.locations.isEmpty()) "Mark your car, hotel, or camp to navigate back offline." else "Try adjusting your search or category filter.",
+                            text = if (uiState.locations.isEmpty()) "Bookmark your car, keys, hotel, or bag to locate on map." else "Try adjusting your search or category filter.",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
@@ -262,7 +254,7 @@ fun MyPlacesScreen(
                     items(uiState.filteredLocations, key = { it.location.id }) { item ->
                         LocationCard(
                             item = item,
-                            onNavigate = { onNavigateToRadar(item.location) },
+                            onLocateOnMap = { onLocateOnMap(item.location) },
                             onToggleFavorite = { viewModel.toggleFavorite(item.location) },
                             onEdit = { locationToEdit = item.location },
                             onDelete = { viewModel.deleteLocation(item.location) }
@@ -334,13 +326,15 @@ fun MyPlacesScreen(
 @Composable
 fun LocationCard(
     item: SavedLocationWithDistance,
-    onNavigate: () -> Unit,
+    onLocateOnMap: () -> Unit,
     onToggleFavorite: () -> Unit,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val loc = item.location
+    val dateFormat = remember { SimpleDateFormat("dd MMM, hh:mm a", Locale.getDefault()) }
+    val savedDateText = remember(loc.timestamp) { dateFormat.format(Date(loc.timestamp)) }
 
     GlassCard(
         modifier = modifier.fillMaxWidth(),
@@ -359,7 +353,7 @@ fun LocationCard(
                 // Category Icon Badge
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(46.dp)
                         .clip(CircleShape)
                         .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)),
                     contentAlignment = Alignment.Center
@@ -394,7 +388,7 @@ fun LocationCard(
                     }
 
                     Text(
-                        text = GeoUtils.formatCoordinates(loc.latitude, loc.longitude),
+                        text = "Saved $savedDateText",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -409,7 +403,7 @@ fun LocationCard(
                 }
             }
 
-            // Distance & Navigate CTA
+            // Distance & Locate on Map CTA
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(4.dp)
@@ -449,7 +443,7 @@ fun LocationCard(
                 }
 
                 Button(
-                    onClick = onNavigate,
+                    onClick = onLocateOnMap,
                     shape = RoundedCornerShape(10.dp),
                     contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
                     colors = ButtonDefaults.buttonColors(
@@ -457,12 +451,12 @@ fun LocationCard(
                     )
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Navigation,
+                        imageVector = Icons.Default.Map,
                         contentDescription = null,
                         modifier = Modifier.size(14.dp)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("RADAR", style = MaterialTheme.typography.labelSmall)
+                    Text("LOCATE ON MAP", style = MaterialTheme.typography.labelSmall)
                 }
             }
         }

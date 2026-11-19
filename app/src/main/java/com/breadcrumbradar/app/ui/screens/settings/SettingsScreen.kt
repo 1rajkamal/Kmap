@@ -72,14 +72,13 @@ fun SettingsScreen(
         }
 
         // ==========================================
-        // 1. APPEARANCE
+        // 1. APPEARANCE & THEME
         // ==========================================
-        SettingsSectionHeader(title = "1. Appearance", icon = Icons.Default.Palette)
+        SettingsSectionHeader(title = "1. Appearance & Theme", icon = Icons.Default.Palette)
         GlassCard(contentPadding = 16.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                // Theme Mode Selector
                 Text(
-                    text = "Theme Mode",
+                    text = "App Theme Mode",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -111,61 +110,87 @@ fun SettingsScreen(
                         }
                     }
                 }
+            }
+        }
 
-                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
-
-                // Radar Theme Accent Colors
+        // ==========================================
+        // 2. MAP SETTINGS
+        // ==========================================
+        SettingsSectionHeader(title = "2. Map Settings", icon = Icons.Default.Map)
+        GlassCard(contentPadding = 16.dp) {
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                // Map Style
                 Text(
-                    text = "Radar Accent Color",
+                    text = "Map Tile Source",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                val radarThemes = listOf(
-                    "EMERALD" to Color(0xFF00E676),
-                    "CYAN" to Color(0xFF00E5FF),
-                    "AMBER" to Color(0xFFFFB300),
-                    "MONOCHROME" to Color(0xFFE2E8F0)
-                )
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(14.dp)
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    radarThemes.forEach { (name, color) ->
-                        val isSelected = settings.radarTheme == name
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.clickable { viewModel.setRadarTheme(name) }
+                    MapStyleMode.entries.forEach { style ->
+                        val isSelected = settings.mapStyle == style
+                        Surface(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { viewModel.setMapStyle(style) },
+                            shape = RoundedCornerShape(12.dp),
+                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .size(38.dp)
-                                    .clip(CircleShape)
-                                    .background(color)
-                                    .border(
-                                        width = if (isSelected) 3.dp else 1.dp,
-                                        color = if (isSelected) Color.White else Color.Transparent,
-                                        shape = CircleShape
-                                    )
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = name.take(3),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                                modifier = Modifier.padding(vertical = 10.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = style.displayName.substringBefore(" ("),
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         }
                     }
+                }
+
+                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+
+                // Default Zoom Level Selector
+                Text(
+                    text = "Default Map Zoom: %.1fx".format(settings.defaultZoomLevel),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Slider(
+                    value = settings.defaultZoomLevel.toFloat(),
+                    onValueChange = { viewModel.setDefaultZoomLevel(it.toDouble()) },
+                    valueRange = 14f..19f,
+                    steps = 9
+                )
+
+                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+
+                // Prefer Road Routing Toggle
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text("Online Road Routing (OSRM)", style = MaterialTheme.typography.titleMedium)
+                        Text("Traces actual street route when online; falls back to straight line when offline", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                    }
+                    Switch(checked = settings.preferRoadRouting, onCheckedChange = { viewModel.setPreferRoadRouting(it) })
                 }
             }
         }
 
         // ==========================================
-        // 2. RADAR SETTINGS
+        // 3. DISTANCE UNITS & ARRIVAL RADIUS
         // ==========================================
-        SettingsSectionHeader(title = "2. Radar Navigation", icon = Icons.Default.Explore)
+        SettingsSectionHeader(title = "3. Distance & Navigation Units", icon = Icons.Default.Straighten)
         GlassCard(contentPadding = 16.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                // Distance Units
                 Text(
                     text = "Distance Unit",
                     style = MaterialTheme.typography.titleMedium,
@@ -201,35 +226,9 @@ fun SettingsScreen(
 
                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
 
-                // Radar Sweep Animation Speed
-                Text(
-                    text = "Radar Sweep Speed",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                    items(RadarSpeed.entries.toTypedArray()) { speed ->
-                        val isSelected = settings.radarSpeed == speed
-                        Surface(
-                            modifier = Modifier.clickable { viewModel.setRadarSpeed(speed) },
-                            shape = RoundedCornerShape(10.dp),
-                            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
-                        ) {
-                            Text(
-                                text = speed.displayName,
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-                            )
-                        }
-                    }
-                }
-
-                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
-
                 // Arrival Radius
                 Text(
-                    text = "Arrival Detection Radius",
+                    text = "Destination Arrival Radius",
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -250,28 +249,13 @@ fun SettingsScreen(
                         }
                     }
                 }
-
-                Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
-
-                // Radar Glow Toggle
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column {
-                        Text("Circular Radar Glow", style = MaterialTheme.typography.titleMedium)
-                        Text("Soft luminous aura around rings", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(checked = settings.radarGlow, onCheckedChange = { viewModel.setRadarGlow(it) })
-                }
             }
         }
 
         // ==========================================
-        // 3. LOCATION SETTINGS
+        // 4. LOCATION & GPS SETTINGS
         // ==========================================
-        SettingsSectionHeader(title = "3. GPS & Precision", icon = Icons.Default.GpsFixed)
+        SettingsSectionHeader(title = "4. GPS & Precision", icon = Icons.Default.GpsFixed)
         GlassCard(contentPadding = 16.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Text(
@@ -299,7 +283,6 @@ fun SettingsScreen(
 
                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
 
-                // System Location Permission Button
                 Button(
                     onClick = {
                         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
@@ -318,9 +301,9 @@ fun SettingsScreen(
         }
 
         // ==========================================
-        // 4. NOTIFICATIONS & FEEDBACK
+        // 5. NOTIFICATIONS & FEEDBACK
         // ==========================================
-        SettingsSectionHeader(title = "4. Notifications & Alerts", icon = Icons.Default.Notifications)
+        SettingsSectionHeader(title = "5. Notifications & Alerts", icon = Icons.Default.Notifications)
         GlassCard(contentPadding = 16.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
                 Row(
@@ -330,7 +313,7 @@ fun SettingsScreen(
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text("Vibrate on Arrival", style = MaterialTheme.typography.titleMedium)
-                        Text("Haptic pulses when within target radius", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
+                        Text("Haptic pulses when within target arrival radius", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
                     }
                     Switch(checked = settings.vibrateOnArrival, onCheckedChange = { viewModel.setVibrateOnArrival(it) })
                 }
@@ -352,9 +335,9 @@ fun SettingsScreen(
         }
 
         // ==========================================
-        // 5. PRIVACY & STORAGE (100% LOCAL GUARANTEE)
+        // 6. PRIVACY & LOCAL STORAGE
         // ==========================================
-        SettingsSectionHeader(title = "5. Privacy & Local Storage", icon = Icons.Default.Lock)
+        SettingsSectionHeader(title = "6. Privacy & Local Storage", icon = Icons.Default.Lock)
         GlassCard(contentPadding = 16.dp) {
             Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 Row(
@@ -377,7 +360,6 @@ fun SettingsScreen(
 
                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
 
-                // Delete All Data Button
                 OutlinedButton(
                     onClick = { showDeleteAllDialog = true },
                     modifier = Modifier.fillMaxWidth(),
@@ -392,27 +374,7 @@ fun SettingsScreen(
         }
 
         // ==========================================
-        // 6. BATTERY & PERFORMANCE
-        // ==========================================
-        SettingsSectionHeader(title = "6. Battery & Performance", icon = Icons.Default.BatteryChargingFull)
-        GlassCard(contentPadding = 16.dp) {
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Column(modifier = Modifier.weight(1f)) {
-                        Text("Eco Radar Mode", style = MaterialTheme.typography.titleMedium)
-                        Text("Disables continuous sweep beam to preserve battery on long hikes", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
-                    }
-                    Switch(checked = settings.ecoRadarMode, onCheckedChange = { viewModel.setEcoRadarMode(it) })
-                }
-            }
-        }
-
-        // ==========================================
-        // 7. ABOUT & LEGAL
+        // 7. ABOUT KMAP
         // ==========================================
         SettingsSectionHeader(title = "7. About Kmap", icon = Icons.Default.Info)
         GlassCard(contentPadding = 16.dp) {
@@ -436,14 +398,14 @@ fun SettingsScreen(
                             color = MaterialTheme.colorScheme.onSurface
                         )
                         Text(
-                            text = "Offline Wayfinding & Personal Map",
+                            text = "Real Map-Based Personal Location Tracker",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
                 }
                 Text(
-                    text = "A production-grade, offline-first personal location bookmarking & directional wayfinding application. Engineered with Kotlin, Jetpack Compose, Room SQLite, and OpenStreetMap.",
+                    text = "A production-grade, offline-first personal location bookmarking & interactive wayfinding application. Powered by OpenStreetMap, Room Database, and Jetpack Compose.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -495,7 +457,6 @@ fun SettingsScreen(
 
                 Divider(color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
 
-                // Action Buttons
                 Button(
                     onClick = {
                         val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/1rajkamal/Kmap"))
@@ -524,7 +485,6 @@ fun SettingsScreen(
                     Text("1-Click Direct Download APK")
                 }
 
-                // Step-by-Step Update Guide
                 Surface(
                     shape = RoundedCornerShape(12.dp),
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f)
@@ -558,7 +518,6 @@ fun SettingsScreen(
         Spacer(modifier = Modifier.height(70.dp))
     }
 
-    // Delete All Confirmation Dialog
     if (showDeleteAllDialog) {
         AlertDialog(
             onDismissRequest = { showDeleteAllDialog = false },
@@ -586,7 +545,6 @@ fun SettingsScreen(
         )
     }
 
-    // Privacy Dialog
     if (showPrivacyDialog) {
         AlertDialog(
             onDismissRequest = { showPrivacyDialog = false },
@@ -605,16 +563,15 @@ fun SettingsScreen(
         )
     }
 
-    // Open Source Licenses Dialog
     if (showLicensesDialog) {
         AlertDialog(
             onDismissRequest = { showLicensesDialog = false },
             title = { Text("Open Source Software") },
             text = {
                 Column(verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Text("• OpenStreetMap & osmdroid (Apache 2.0 / ODbL)", style = MaterialTheme.typography.bodyMedium)
                     Text("• Android Jetpack & Compose (Apache 2.0)", style = MaterialTheme.typography.bodyMedium)
                     Text("• Room Persistence Library (Apache 2.0)", style = MaterialTheme.typography.bodyMedium)
-                    Text("• osmdroid (OpenStreetMap Android, Apache 2.0)", style = MaterialTheme.typography.bodyMedium)
                     Text("• Google Gson (Apache 2.0)", style = MaterialTheme.typography.bodyMedium)
                 }
             },

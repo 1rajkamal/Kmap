@@ -19,16 +19,28 @@ class SettingsViewModel(
         settingsRepository.updateSettings { it.copy(themeMode = mode) }
     }
 
-    fun setAccentColor(hex: String) {
-        settingsRepository.updateSettings { it.copy(accentColorHex = hex) }
+    fun setMapStyle(style: MapStyleMode) {
+        settingsRepository.updateSettings { it.copy(mapStyle = style) }
     }
 
-    fun setRadarTheme(theme: String) {
-        settingsRepository.updateSettings { it.copy(radarTheme = theme) }
+    fun setDefaultZoomLevel(zoom: Double) {
+        settingsRepository.updateSettings { it.copy(defaultZoomLevel = zoom) }
     }
 
-    fun setRadarSpeed(speed: RadarSpeed) {
-        settingsRepository.updateSettings { it.copy(radarSpeed = speed) }
+    fun setAutoRecenter(enabled: Boolean) {
+        settingsRepository.updateSettings { it.copy(autoRecenterOnMove = enabled) }
+    }
+
+    fun setShowCompass(enabled: Boolean) {
+        settingsRepository.updateSettings { it.copy(showCompassWidget = enabled) }
+    }
+
+    fun setShowZoomControls(enabled: Boolean) {
+        settingsRepository.updateSettings { it.copy(showZoomControls = enabled) }
+    }
+
+    fun setPreferRoadRouting(enabled: Boolean) {
+        settingsRepository.updateSettings { it.copy(preferRoadRouting = enabled) }
     }
 
     fun setDistanceUnit(unit: DistanceUnit) {
@@ -57,18 +69,6 @@ class SettingsViewModel(
 
     fun setGpsLostWarning(enabled: Boolean) {
         settingsRepository.updateSettings { it.copy(gpsLostWarning = enabled) }
-    }
-
-    fun setRadarGlow(enabled: Boolean) {
-        settingsRepository.updateSettings { it.copy(radarGlow = enabled) }
-    }
-
-    fun setShowCircularGrid(enabled: Boolean) {
-        settingsRepository.updateSettings { it.copy(showCircularGrid = enabled) }
-    }
-
-    fun setEcoRadarMode(enabled: Boolean) {
-        settingsRepository.updateSettings { it.copy(ecoRadarMode = enabled) }
     }
 
     fun deleteAllSavedLocations(onDone: () -> Unit) {

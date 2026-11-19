@@ -33,10 +33,13 @@ import com.breadcrumbradar.app.ui.theme.ElectricEmerald
 val categoryIconMap = mapOf(
     "directions_car" to Icons.Default.DirectionsCar,
     "local_parking" to Icons.Default.LocalParking,
-    "hotel" to Icons.Default.Hotel,
+    "vpn_key" to Icons.Default.VpnKey,
+    "directions_walk" to Icons.Default.DirectionsWalk,
     "backpack" to Icons.Default.Backpack,
+    "hotel" to Icons.Default.Hotel,
     "terrain" to Icons.Default.Terrain,
     "groups" to Icons.Default.Groups,
+    "two_wheeler" to Icons.Default.TwoWheeler,
     "devices" to Icons.Default.Devices,
     "place" to Icons.Default.Place,
     "star" to Icons.Default.Star,
@@ -158,24 +161,32 @@ fun MarkLocationDialog(
                                 name = preset
                                 when (preset) {
                                     "My Car", "Parked Spot" -> {
-                                        selectedCategory = LocationCategory.PARKING
-                                        selectedIcon = "local_parking"
+                                        selectedCategory = LocationCategory.CAR
+                                        selectedIcon = LocationCategory.CAR.defaultIcon
                                     }
                                     "Hotel" -> {
-                                        selectedCategory = LocationCategory.TRAVEL
-                                        selectedIcon = "hotel"
+                                        selectedCategory = LocationCategory.HOTEL
+                                        selectedIcon = LocationCategory.HOTEL.defaultIcon
                                     }
-                                    "Baggage", "Shoes" -> {
-                                        selectedCategory = LocationCategory.PERSONAL
-                                        selectedIcon = "backpack"
+                                    "Baggage" -> {
+                                        selectedCategory = LocationCategory.BAG
+                                        selectedIcon = LocationCategory.BAG.defaultIcon
+                                    }
+                                    "Shoes" -> {
+                                        selectedCategory = LocationCategory.SHOES
+                                        selectedIcon = LocationCategory.SHOES.defaultIcon
+                                    }
+                                    "Bike" -> {
+                                        selectedCategory = LocationCategory.BIKE
+                                        selectedIcon = LocationCategory.BIKE.defaultIcon
                                     }
                                     "Campsite" -> {
                                         selectedCategory = LocationCategory.OUTDOOR
-                                        selectedIcon = "terrain"
+                                        selectedIcon = LocationCategory.OUTDOOR.defaultIcon
                                     }
                                     "Meeting Spot" -> {
                                         selectedCategory = LocationCategory.MEETING
-                                        selectedIcon = "groups"
+                                        selectedIcon = LocationCategory.MEETING.defaultIcon
                                     }
                                 }
                             },

@@ -1,7 +1,6 @@
 package com.breadcrumbradar.app.ui.theme
 
 import android.app.Activity
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -13,11 +12,11 @@ import androidx.core.view.WindowCompat
 import com.breadcrumbradar.app.data.model.AppThemeMode
 
 private val DarkColorScheme = darkColorScheme(
-    primary = ElectricEmerald,
-    onPrimary = Color.Black,
-    primaryContainer = Color(0xFF00381B),
-    onPrimaryContainer = ElectricEmerald,
-    secondary = CyberCyan,
+    primary = GoogleRoyalBlue,
+    onPrimary = Color.White,
+    primaryContainer = NavyDeep,
+    onPrimaryContainer = Color.White,
+    secondary = ElectricCyan,
     onSecondary = Color.Black,
     background = DarkBackground,
     onBackground = TextPrimary,
@@ -29,11 +28,11 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF059669),
+    primary = GoogleRoyalBlue,
     onPrimary = Color.White,
-    primaryContainer = Color(0xFFD1FAE5),
-    onPrimaryContainer = Color(0xFF065F46),
-    secondary = Color(0xFF0284C7),
+    primaryContainer = Color(0xFFE8F0FE),
+    onPrimaryContainer = NavyDeep,
+    secondary = ElectricCyan,
     onSecondary = Color.White,
     background = LightBackground,
     onBackground = LightTextPrimary,
@@ -46,8 +45,8 @@ private val LightColorScheme = lightColorScheme(
 
 @Composable
 fun BreadcrumbRadarTheme(
-    themeMode: AppThemeMode = AppThemeMode.DARK,
-    accentColor: Color = ElectricEmerald,
+    themeMode: AppThemeMode = AppThemeMode.LIGHT,
+    accentColor: Color = GoogleRoyalBlue,
     content: @Composable () -> Unit
 ) {
     val isDark = when (themeMode) {
@@ -59,7 +58,7 @@ fun BreadcrumbRadarTheme(
     val baseScheme = if (isDark) DarkColorScheme else LightColorScheme
     val colorScheme = baseScheme.copy(
         primary = accentColor,
-        onPrimary = if (isDark) Color.Black else Color.White
+        onPrimary = Color.White
     )
 
     val view = LocalView.current
@@ -67,8 +66,8 @@ fun BreadcrumbRadarTheme(
         SideEffect {
             val window = (view.context as? Activity)?.window
             if (window != null) {
-                window.statusBarColor = colorScheme.background.toArgb()
-                window.navigationBarColor = colorScheme.background.toArgb()
+                window.statusBarColor = colorScheme.surface.toArgb()
+                window.navigationBarColor = colorScheme.surface.toArgb()
                 WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !isDark
                 WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !isDark
             }

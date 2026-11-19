@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -23,11 +24,10 @@ import com.breadcrumbradar.app.sensor.LocationClient
 import com.breadcrumbradar.app.ui.navigation.AppNavigation
 import com.breadcrumbradar.app.ui.screens.home.HomeViewModel
 import com.breadcrumbradar.app.ui.screens.places.PlacesViewModel
-import com.breadcrumbradar.app.ui.screens.radar.RadarViewModel
 import com.breadcrumbradar.app.ui.screens.settings.SettingsViewModel
 import com.breadcrumbradar.app.ui.screens.trail.TrailViewModel
 import com.breadcrumbradar.app.ui.theme.BreadcrumbRadarTheme
-import com.breadcrumbradar.app.ui.theme.ElectricEmerald
+import com.breadcrumbradar.app.ui.theme.GoogleRoyalBlue
 
 class MainActivity : ComponentActivity() {
 
@@ -60,7 +60,6 @@ class MainActivity : ComponentActivity() {
 
         // ViewModels
         val homeViewModel = HomeViewModel(locationRepository)
-        val radarViewModel = RadarViewModel(locationRepository)
         val placesViewModel = PlacesViewModel(locationRepository)
         val trailViewModel = TrailViewModel(breadcrumbRepository)
         val settingsViewModel = SettingsViewModel(settingsRepository, locationRepository)
@@ -72,35 +71,23 @@ class MainActivity : ComponentActivity() {
             val settings by settingsViewModel.settingsFlow.collectAsState()
             val locationState by locationClient.locationFlow.collectAsState()
             val compassData by compassSensorManager.compassFlow.collectAsState()
-            val allLocations by locationRepository.getAllLocationsFlow().collectAsState(initial = emptyList())
-
-            val accentColor = remember(settings.radarTheme) {
-                when (settings.radarTheme) {
-                    "CYAN" -> Color(0xFF00E5FF)
-                    "AMBER" -> Color(0xFFFFB300)
-                    "MONOCHROME" -> Color(0xFFE2E8F0)
-                    else -> ElectricEmerald
-                }
-            }
 
             BreadcrumbRadarTheme(
                 themeMode = settings.themeMode,
-                accentColor = accentColor
+                accentColor = GoogleRoyalBlue
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = Color.Transparent
+                    color = MaterialTheme.colorScheme.background
                 ) {
                     AppNavigation(
                         homeViewModel = homeViewModel,
-                        radarViewModel = radarViewModel,
                         placesViewModel = placesViewModel,
                         trailViewModel = trailViewModel,
                         settingsViewModel = settingsViewModel,
                         locationState = locationState,
                         compassData = compassData,
-                        settings = settings,
-                        allLocations = allLocations
+                        settings = settings
                     )
                 }
             }

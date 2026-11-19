@@ -19,13 +19,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.breadcrumbradar.app.ui.theme.DarkBorder
-import com.breadcrumbradar.app.ui.theme.DarkSurfaceGlass
-import com.breadcrumbradar.app.ui.theme.ElectricEmerald
 
 enum class NavScreen(val title: String, val icon: ImageVector) {
-    HOME("Home", Icons.Default.Home),
-    RADAR("Radar", Icons.Default.Explore),
+    MAP("Map", Icons.Default.Map),
     PLACES("My Places", Icons.Default.Place),
     TRAIL("Trail", Icons.Default.Timeline),
     SETTINGS("Settings", Icons.Default.Settings)
@@ -40,16 +36,16 @@ fun BottomNavBar(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
+            .padding(horizontal = 20.dp, vertical = 8.dp),
         shape = RoundedCornerShape(26.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.92f),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
         border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outline),
         shadowElevation = 12.dp
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 8.dp, horizontal = 6.dp),
+                .padding(vertical = 8.dp, horizontal = 12.dp),
             horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -64,7 +60,7 @@ fun BottomNavBar(
                     modifier = Modifier
                         .clip(RoundedCornerShape(16.dp))
                         .clickable { onScreenSelected(screen) }
-                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                        .padding(horizontal = 14.dp, vertical = 6.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(3.dp)
                 ) {

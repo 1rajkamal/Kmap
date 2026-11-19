@@ -9,20 +9,20 @@ import kotlinx.coroutines.flow.asStateFlow
 
 class PreferencesManager(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences("breadcrumb_radar_prefs", Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences("kmap_preferences", Context.MODE_PRIVATE)
 
     private val _settingsFlow = MutableStateFlow(loadSettings())
     val settingsFlow: StateFlow<AppSettings> = _settingsFlow.asStateFlow()
 
     private fun loadSettings(): AppSettings {
-        val themeStr = prefs.getString("theme_mode", AppThemeMode.DARK.name) ?: AppThemeMode.DARK.name
-        val theme = runCatching { AppThemeMode.valueOf(themeStr) }.getOrDefault(AppThemeMode.DARK)
+        val themeStr = prefs.getString("theme_mode", AppThemeMode.LIGHT.name) ?: AppThemeMode.LIGHT.name
+        val theme = runCatching { AppThemeMode.valueOf(themeStr) }.getOrDefault(AppThemeMode.LIGHT)
+
+        val mapStyleStr = prefs.getString("map_style", MapStyleMode.STANDARD.name) ?: MapStyleMode.STANDARD.name
+        val mapStyle = runCatching { MapStyleMode.valueOf(mapStyleStr) }.getOrDefault(MapStyleMode.STANDARD)
 
         val unitStr = prefs.getString("distance_unit", DistanceUnit.METRIC.name) ?: DistanceUnit.METRIC.name
         val distanceUnit = runCatching { DistanceUnit.valueOf(unitStr) }.getOrDefault(DistanceUnit.METRIC)
-
-        val speedStr = prefs.getString("radar_speed", RadarSpeed.NORMAL.name) ?: RadarSpeed.NORMAL.name
-        val radarSpeed = runCatching { RadarSpeed.valueOf(speedStr) }.getOrDefault(RadarSpeed.NORMAL)
 
         val radiusStr = prefs.getString("arrival_radius", ArrivalRadius.STANDARD.name) ?: ArrivalRadius.STANDARD.name
         val arrivalRadius = runCatching { ArrivalRadius.valueOf(radiusStr) }.getOrDefault(ArrivalRadius.STANDARD)
@@ -32,18 +32,15 @@ class PreferencesManager(context: Context) {
 
         return AppSettings(
             themeMode = theme,
-            accentColorHex = prefs.getString("accent_color", "#00E676") ?: "#00E676",
-            radarTheme = prefs.getString("radar_theme", "EMERALD") ?: "EMERALD",
-            animationIntensity = prefs.getFloat("animation_intensity", 1.0f),
-            dynamicColor = prefs.getBoolean("dynamic_color", false),
-            compactLayout = prefs.getBoolean("compact_layout", false),
+            mapStyle = mapStyle,
+            defaultZoomLevel = prefs.getFloat("default_zoom", 16.5f).toDouble(),
+            autoRecenterOnMove = prefs.getBoolean("auto_recenter", true),
+            showCompassWidget = prefs.getBoolean("show_compass", true),
+            showZoomControls = prefs.getBoolean("show_zoom_controls", true),
+            preferRoadRouting = prefs.getBoolean("prefer_road_routing", true),
 
-            radarSpeed = radarSpeed,
-            radarGlow = prefs.getBoolean("radar_glow", true),
-            showCircularGrid = prefs.getBoolean("circular_grid", true),
             distanceUnit = distanceUnit,
             arrivalRadius = arrivalRadius,
-            showHeadingDegree = prefs.getBoolean("heading_degree", true),
 
             gpsUpdateRate = gpsRate,
             batterySavingMode = prefs.getBoolean("battery_saver", false),
@@ -54,7 +51,6 @@ class PreferencesManager(context: Context) {
             gpsLostWarning = prefs.getBoolean("gps_lost_warn", true),
             nearbyAlerts = prefs.getBoolean("nearby_alerts", false),
 
-            ecoRadarMode = prefs.getBoolean("eco_radar", false),
             trailLoggingIntervalSeconds = prefs.getInt("trail_interval", 5)
         )
     }
@@ -69,18 +65,15 @@ class PreferencesManager(context: Context) {
     private fun saveSettings(s: AppSettings) {
         prefs.edit()
             .putString("theme_mode", s.themeMode.name)
-            .putString("accent_color", s.accentColorHex)
-            .putString("radar_theme", s.radarTheme)
-            .putFloat("animation_intensity", s.animationIntensity)
-            .putBoolean("dynamic_color", s.dynamicColor)
-            .putBoolean("compact_layout", s.compactLayout)
+            .putString("map_style", s.mapStyle.name)
+            .putFloat("default_zoom", s.defaultZoomLevel.toFloat())
+            .putBoolean("auto_recenter", s.autoRecenterOnMove)
+            .putBoolean("show_compass", s.showCompassWidget)
+            .putBoolean("show_zoom_controls", s.showZoomControls)
+            .putBoolean("prefer_road_routing", s.preferRoadRouting)
 
-            .putString("radar_speed", s.radarSpeed.name)
-            .putBoolean("radar_glow", s.radarGlow)
-            .putBoolean("circular_grid", s.showCircularGrid)
             .putString("distance_unit", s.distanceUnit.name)
             .putString("arrival_radius", s.arrivalRadius.name)
-            .putBoolean("heading_degree", s.showHeadingDegree)
 
             .putString("gps_update_rate", s.gpsUpdateRate.name)
             .putBoolean("battery_saver", s.batterySavingMode)
@@ -91,7 +84,6 @@ class PreferencesManager(context: Context) {
             .putBoolean("gps_lost_warn", s.gpsLostWarning)
             .putBoolean("nearby_alerts", s.nearbyAlerts)
 
-            .putBoolean("eco_radar", s.ecoRadarMode)
             .putInt("trail_interval", s.trailLoggingIntervalSeconds)
             .apply()
     }

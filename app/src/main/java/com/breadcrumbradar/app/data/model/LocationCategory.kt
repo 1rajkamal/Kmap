@@ -1,13 +1,15 @@
 package com.breadcrumbradar.app.data.model
 
 enum class LocationCategory(val displayName: String, val defaultIcon: String) {
-    VEHICLE("Vehicle", "directions_car"),
-    PARKING("Parking Spot", "local_parking"),
-    TRAVEL("Hotel / Stay", "hotel"),
-    PERSONAL("Personal Bag", "backpack"),
-    OUTDOOR("Campsite & Trail", "terrain"),
+    CAR("My Car", "directions_car"),
+    KEYS("My Keys", "vpn_key"),
+    SHOES("My Shoes", "directions_walk"),
+    BAG("My Bag", "backpack"),
+    HOTEL("My Hotel", "hotel"),
     MEETING("Meeting Point", "groups"),
-    GADGET("Device / Gear", "devices"),
+    BIKE("My Bike", "two_wheeler"),
+    PARKING("Parking Spot", "local_parking"),
+    OUTDOOR("Campsite & Nature", "terrain"),
     CUSTOM("Custom Marker", "place");
 
     companion object {
